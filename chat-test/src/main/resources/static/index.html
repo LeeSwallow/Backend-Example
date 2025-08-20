@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>채팅방 대시보드</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <h1 class="mb-4">채팅방 데모</h1>
+
+    <div class="row g-4">
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">닉네임 설정</h5>
+            <div class="mb-3">
+              <label for="nickname" class="form-label">닉네임</label>
+              <input id="nickname" type="text" class="form-control" placeholder="닉네임을 입력하세요" />
+            </div>
+            <div class="d-flex gap-2">
+              <button id="refreshRooms" class="btn btn-outline-primary">방 새로고침</button>
+              <button id="clearNickname" class="btn btn-outline-secondary">닉네임 지우기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">채팅방 생성</h5>
+            <form id="createRoomForm" class="vstack gap-3">
+              <div>
+                <label for="roomName" class="form-label">방 이름</label>
+                <input id="roomName" type="text" class="form-control" placeholder="예) PNU 스터디" required />
+              </div>
+              <div>
+                <label for="roomDesc" class="form-label">설명</label>
+                <textarea id="roomDesc" class="form-control" rows="2" placeholder="방 설명(선택)"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">생성</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title d-flex align-items-center justify-content-between">
+              <span>채팅방 목록</span>
+              <span class="badge text-bg-secondary" id="roomCount">0</span>
+            </h5>
+            <div id="rooms" class="list-group small"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const api = {
+      rooms: '/api/chatrooms',
+      users: '/api/users'
+    };
+
+    const el = {
+      nickname: document.getElementById('nickname'),
+      refreshRooms: document.getElementById('refreshRooms'),
+      clearNickname: document.getElementById('clearNickname'),
+      createRoomForm: document.getElementById('createRoomForm'),
+      roomName: document.getElementById('roomName'),
+      roomDesc: document.getElementById('roomDesc'),
+      rooms: document.getElementById('rooms'),
+      roomCount: document.getElementById('roomCount')
+    };
+
+    // 저장된 닉네임 복원
+    el.nickname.value = localStorage.getItem('nickname') || '';
+    el.nickname.addEventListener('input', () => {
+      localStorage.setItem('nickname', el.nickname.value.trim());
+    });
+
+    el.clearNickname.addEventListener('click', () => {
+      el.nickname.value = '';
+      localStorage.removeItem('nickname');
+    });
+
+    // 방 목록 로드
+    async function loadRooms() {
+      el.rooms.innerHTML = '<div class="text-muted">불러오는 중...</div>';
+      try {
+        const res = await fetch(api.rooms);
+        if (!res.ok) throw new Error('방 목록 조회 실패');
+        const data = await res.json();
+        renderRooms(data);
+      } catch (e) {
+        el.rooms.innerHTML = `<div class="text-danger">오류: ${e.message}</div>`;
+      }
+    }
+
+    function renderRooms(rooms) {
+      el.rooms.innerHTML = '';
+      el.roomCount.textContent = rooms.length;
+      if (!rooms.length) {
+        el.rooms.innerHTML = '<div class="text-muted">아직 생성된 방이 없습니다.</div>';
+        return;
+      }
+      rooms.forEach(room => {
+        const item = document.createElement('div');
+        item.className = 'list-group-item list-group-item-action';
+        item.innerHTML = `
+          <div class="d-flex w-100 justify-content-between align-items-center">
+            <div class="me-2">
+              <div class="fw-semibold">${escapeHtml(room.name)}</div>
+              <small class="text-muted">${escapeHtml(room.description || '')}</small>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-primary">참여하기</button>
+            </div>
+          </div>`;
+
+        const joinBtn = item.querySelector('button');
+        joinBtn.addEventListener('click', () => joinRoom(room));
+        el.rooms.appendChild(item);
+      });
+    }
+
+    function escapeHtml(str) {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 방 생성
+    el.createRoomForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const name = el.roomName.value.trim();
+      const description = el.roomDesc.value.trim();
+      if (!name) {
+        alert('방 이름을 입력하세요');
+        el.roomName.focus();
+        return;
+      }
+      try {
+        const res = await fetch(api.rooms, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description })
+        });
+        if (!res.ok) throw new Error('방 생성 실패');
+        el.roomName.value = '';
+        el.roomDesc.value = '';
+        await loadRooms();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    // 방 참여
+    async function joinRoom(room) {
+      const nickname = el.nickname.value.trim();
+      if (!nickname) {
+        alert('닉네임을 먼저 입력하세요');
+        el.nickname.focus();
+        return;
+      }
+      try {
+        const res = await fetch(api.users, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname, chatRoomId: room.roomId })
+        });
+        if (!res.ok) throw new Error('유저 생성(참여) 실패');
+        const user = await res.json();
+        // 채팅 페이지로 이동 (roomId, userId, nickname 전달)
+        const q = new URLSearchParams({
+          roomId: room.roomId,
+          userId: user.id,
+          nickname: user.nickname
+        }).toString();
+        window.location.href = `/chat.html?${q}`;
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    el.refreshRooms.addEventListener('click', loadRooms);
+    loadRooms();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
