@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface SggRepository extends JpaRepository<Sigungu, Long> {
     @Query("""
-        SELECT s FROM Sigungu s 
+        SELECT s FROM Sigungu s
         WHERE ST_Contains(
                 s.area, ST_SetSRID(ST_MakePoint(:long, :lat), 4326)
         )
