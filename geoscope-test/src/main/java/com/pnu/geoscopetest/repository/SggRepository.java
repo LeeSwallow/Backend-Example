@@ -9,6 +9,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface SggRepository extends JpaRepository<Sigungu, Long> {
-    @Query(value = "SELECT s FROM Sigungu s WHERE ST_Contains(s.area, ST_SetSRID(ST_MakePoint(:long, :lat), 4326)) = true", nativeQuery = true)
+    @Query("""
+        SELECT s FROM Sigungu s 
+        WHERE ST_Contains(
+                s.area, ST_SetSRID(ST_MakePoint(:long, :lat), 4326)
+        )
+    """)
     Optional<Sigungu> findByLocation(@Param("lat") double latitude, @Param("long") double longitude);
 }
