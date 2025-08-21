@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: geoscope-test
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test_spatital
+    username: test_user
+    password: leemin104
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+
