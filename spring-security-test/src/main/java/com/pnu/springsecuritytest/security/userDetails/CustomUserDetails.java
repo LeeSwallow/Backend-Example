@@ -1,6 +1,6 @@
 package com.pnu.springsecuritytest.security.userDetails;
 
-import com.pnu.springsecuritytest.dto.CustomUserInfoDto;
+import com.pnu.springsecuritytest.dto.auth.CustomUserInfo;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -8,9 +8,9 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final CustomUserInfoDto userInfo;
+    private final CustomUserInfo userInfo;
 
-    public CustomUserDetails(CustomUserInfoDto userInfo){
+    public CustomUserDetails(CustomUserInfo userInfo){
         this.userInfo = userInfo;
     }
 

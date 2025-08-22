@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class User extends BaseEntity {
-    @Column(unique = true, nullable = false)
 
+    @Column(unique = true, nullable = false)
     private String email;
 
     private String password;
@@ -53,6 +53,22 @@ public class User extends BaseEntity {
         fetch = FetchType.EAGER
     )
     private List<AuthProvider> authProviders = new ArrayList<>();
+
+    public User() {
+        this.enabled = true;
+        this.accountNonExpired = true;
+        this.credentialsNonExpired = true;
+        this.accountNonLocked = true;
+        this.failedLoginAttempts = 0;
+    }
+
+    public User(String email, String password, Integer age, String name) {
+        this();
+        this.email = email;
+        this.password = password;
+        this.age = age;
+        this.name = name;
+    }
 
     public Set<RoleType> getRoleTypes() {
         return roles.stream()

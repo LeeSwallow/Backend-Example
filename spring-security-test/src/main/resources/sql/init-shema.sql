@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS user_role CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
 DROP TABLE IF EXISTS providers CASCADE;
+DROP TABLE IF EXISTS refresh_tokens CASCADE;
 
 CREATE TABLE providers (
     id SERIAL PRIMARY KEY,
@@ -24,7 +25,7 @@ CREATE TABLE users (
     account_non_expired BOOLEAN DEFAULT TRUE,
     credentials_non_expired BOOLEAN DEFAULT TRUE,
     failed_longin_attempts INT DEFAULT 0,
-    last_login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -42,3 +43,13 @@ CREATE TABLE user_role (
     role_id INT NOT NULL REFERENCES roles(id),
     PRIMARY KEY (user_id, role_id)
 );
+
+-- 임시로 db에 저장되는 토큰 테이블
+CREATE TABLE refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT GEN_RANDOM_UUID(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    expired_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL
+)

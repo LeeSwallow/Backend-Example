@@ -1,8 +1,8 @@
-package com.pnu.springsecuritytest.dto;
+package com.pnu.springsecuritytest.dto.auth;
 
 import java.util.Set;
 
-public record CustomUserInfoDto (
+public record CustomUserInfo(
     String id,
     String password,
     Boolean enabled,

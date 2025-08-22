@@ -1,12 +1,15 @@
 package com.pnu.springsecuritytest.security.jwt;
 
 
+import com.pnu.springsecuritytest.common.model.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Component
@@ -28,25 +31,27 @@ public class TokenProvider {
         this.issuer = issuer;
     }
 
-    public String generateAccessToken(String userId) {
-        return generateToken(userId, accessTokenExpirationMillis);
+    public TokenInfo generateAccessToken(String sub) {
+        return generateToken(sub, accessTokenExpirationMillis);
     }
 
-    public String generateRefreshToken(String userId) {
-        return generateToken(userId, refreshTokenExpirationMillis);
+    public TokenInfo generateRefreshToken(String sub) {
+        return generateToken(sub, refreshTokenExpirationMillis);
     }
 
-    public String generateToken(String sub, Long expirationMillis) {
+    public TokenInfo generateToken(String sub, Long expirationMillis) {
+        LocalDateTime expirationLocal = LocalDateTime.now().plusSeconds(expirationMillis / 1000);
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + expirationMillis);
-
-        return Jwts.builder()
+        Date expiration = Date.from(expirationLocal.atZone(ZoneId.systemDefault()).toInstant());
+        String token = Jwts.builder()
                 .subject(sub)
                 .issuer(issuer)
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(secretKey)
                 .compact();
+
+        return new TokenInfo(token, expirationLocal);
     }
 
     public String getUserIdFromToken(String token) {
