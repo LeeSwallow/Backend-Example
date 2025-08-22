@@ -4,7 +4,6 @@ package com.pnu.springsecuritytest.entity;
 import com.pnu.springsecuritytest.entity.type.RoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
