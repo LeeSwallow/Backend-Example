@@ -1,11 +1,16 @@
 package com.pnu.springsecuritytest.entity;
 
+import com.pnu.springsecuritytest.entity.type.ProviderType;
+import com.pnu.springsecuritytest.entity.type.RoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -22,6 +27,18 @@ public class User extends BaseEntity {
 
     private String name;
 
+    private Boolean enabled;
+
+    private Boolean accountNonExpired;
+
+    private Boolean credentialsNonExpired;
+
+    private Boolean accountNonLocked;
+
+    private Integer  failedLoginAttempts;
+
+    private LocalDateTime lastLoginAt;
+
     @ManyToMany
     @JoinTable(
         name = "user_role",
@@ -36,4 +53,16 @@ public class User extends BaseEntity {
         fetch = FetchType.EAGER
     )
     private List<AuthProvider> authProviders = new ArrayList<>();
+
+    public Set<RoleType> getRoleTypes() {
+        return roles.stream()
+            .map(Role::getName)
+            .collect(Collectors.toSet());
+    }
+
+    public Set<ProviderType> getProviderTypes() {
+        return authProviders.stream()
+            .map(auth -> auth.getProvider().getName())
+            .collect(Collectors.toSet());
+    }
 }

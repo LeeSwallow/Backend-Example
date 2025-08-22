@@ -15,11 +15,16 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT GEN_RANDOM_UUID(),
     email TEXT UNIQUE,
     password TEXT,  -- 외부 인증만 사용할 땐 NULL 가능
     age INT CHECK (age >= 0),
     name VARCHAR(100) NOT NULL,
+    enabled BOOLEAN DEFAULT TRUE,
+    account_non_expired BOOLEAN DEFAULT TRUE,
+    credentials_non_expired BOOLEAN DEFAULT TRUE,
+    failed_longin_attempts INT DEFAULT 0,
+    last_login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

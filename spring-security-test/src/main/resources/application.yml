@@ -1,15 +1,25 @@
 spring:
-
   application:
     name: spring-security-test
-
   datasource:
-    username: sa
-    password:
+    url: "jdbc:postgresql://localhost:5432/test_security"
+    username: "test_user"
+    password: "leemin104"
+    driver-class-name: "org.postgresql.Driver"
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      mode: embedded
+      platform: postgres
+      data-locations: classpath:sql/init-data.sql
 
-  h2:
-    console:
-      enabled: true
-
-
-
+jwt:
+  secret: 90f38491d4daa5f3dd7671ca06d1bf00cbf240706a71389461d63015b169d602de194b832efc8b1536c50272602376025a4d25c974fc0dc192cddb19b91bc085
+  access_token:
+    expiration: 3600
+  refresh_token:
+    expiration: 604800
+  issuer: "spring-security-test"
