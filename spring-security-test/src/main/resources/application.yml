@@ -1,0 +1,16 @@
+spring:
+
+  application:
+    name: spring-security-test
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+
+
