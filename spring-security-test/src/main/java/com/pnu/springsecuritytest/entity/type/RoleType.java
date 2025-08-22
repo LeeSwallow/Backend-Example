@@ -1,4 +1,5 @@
 package com.pnu.springsecuritytest.entity.type;
 
-public class RoleType {
+public enum RoleType {
+    ROLE_GUEST, ROLE_USER, ROLE_ADMIN;
 }
