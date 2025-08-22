@@ -20,5 +20,5 @@ public class AuthProviderId implements Serializable {
     private UUID userId;
 
     @Column(name = "provider_id")
-    private Long providerId;
+    private Integer providerId;
 }

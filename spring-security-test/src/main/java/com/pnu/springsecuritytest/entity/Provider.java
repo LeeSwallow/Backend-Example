@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Provider {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
     private ProviderType name;

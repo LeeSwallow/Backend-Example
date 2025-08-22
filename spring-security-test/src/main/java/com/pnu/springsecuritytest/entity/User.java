@@ -39,7 +39,7 @@ public class User extends BaseEntity {
 
     private LocalDateTime lastLoginAt;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_role",
         joinColumns = @JoinColumn(name = "user_id"),
@@ -71,13 +71,13 @@ public class User extends BaseEntity {
     }
 
     public Set<RoleType> getRoleTypes() {
-        return roles.stream()
+        return getRoles().stream()
             .map(Role::getName)
             .collect(Collectors.toSet());
     }
 
     public Set<ProviderType> getProviderTypes() {
-        return authProviders.stream()
+        return getAuthProviders().stream()
             .map(auth -> auth.getProvider().getName())
             .collect(Collectors.toSet());
     }

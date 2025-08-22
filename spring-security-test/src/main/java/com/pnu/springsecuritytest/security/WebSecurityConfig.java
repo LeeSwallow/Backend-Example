@@ -7,7 +7,6 @@ import com.pnu.springsecuritytest.security.jwt.TokenProvider;
 import com.pnu.springsecuritytest.security.userDetails.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -72,9 +71,9 @@ public class WebSecurityConfig {
 
                 // whitelist 설정
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/auth/signup").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/signup").permitAll()
+                        .requestMatchers("/api/auth/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 // jwt 필터를 UsernamePasswordAuthenticationFilter 이전에 추가

@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
@@ -24,6 +25,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final Set<String> WHITELIST_URLS = Set.of(
+            "/api/auth/login",
+            "/api/auth/signup",
+            "/api/auth/refresh"
+    );
 
     public JwtAuthenticationFilter(
             TokenProvider tokenProvider,
@@ -41,6 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+
+        // 요청 URI가 화이트리스트에 있는지 확인
+        // 화이트리스트에 있는 경우 토큰 검증 없이 다음 필터로 요청
+        String path = request.getRequestURI();
+        if (WHITELIST_URLS.contains(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             // 토큰 추출 -> 없으면 예외 발생

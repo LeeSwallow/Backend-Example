@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
 
@@ -23,7 +20,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PutMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(
             @RequestBody LoginRequest loginRequest
         ) throws AuthenticationException {
@@ -33,7 +30,7 @@ public class AuthController {
         ));
     }
 
-    @PutMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<TokenResponse> signUp(
             @RequestBody SignupRequest signupRequest
         ) {
@@ -46,8 +43,7 @@ public class AuthController {
         ));
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    @PutMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshToken(
             @AuthenticationPrincipal UserDetails userDetails
             ) throws AuthenticationException {
@@ -55,7 +51,7 @@ public class AuthController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    @PutMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
