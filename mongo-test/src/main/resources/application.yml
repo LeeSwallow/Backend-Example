@@ -5,6 +5,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://test_user:test_pass@localhost:27017/test_spring
+      uuid-representation: standard
 
 
   datasource:
